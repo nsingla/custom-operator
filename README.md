@@ -1,5 +1,5 @@
 # Custom Operator
-A simple python based custom operator
+A simple python based custom [Kubernetes](https://github.com/kubernetes/kubernetes) operator
 
 ## This is still a WIP
 
