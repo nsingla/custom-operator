@@ -1,0 +1,17 @@
+apiVersion: test.com/v1
+kind: TestPod
+metadata:
+  name: nsingla-test
+custom_annotations:
+  - name: "helm.sh/hook"
+    value: "post-install"
+secrets:
+  - name: "artifactory-creds"
+name: nsingla-test
+image_name: nsingla-tests
+image_tag: latest
+command: ["/bin/sh", "-c"]
+args:
+    - eval poetry run ${SCRIPT}
+    - echo "Nelesh Test"
+restartPolicy: Never

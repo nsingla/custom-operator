@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "test-controller"
+version = "1.0.0"
+description = "Custom Test Pod Controller"
+authors = ["Nelesh Singla <nelesh.singla@walmartasr.com>"]
+packages = [{include = "test_controller"}]
+license = "Proprietary"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+kubernetes = "^32.0.1"
+python-rest-client = {path = "/Users/nsingla/Desktop/git/nsingla/python-rest-client"}
+custom-resource = "^0.1.9"
+
+[tool.poetry.group.dev.dependencies]
+setuptools = "75.7.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "alert"
+url = "https://alertinnovation.jfrog.io/artifactory/api/pypi/pypi/simple"
+
+[tool.poetry.scripts]
+custom_controller = "test_controller.main.test_controller:custom_controller"

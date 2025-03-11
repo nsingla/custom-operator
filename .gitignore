@@ -1,0 +1,15 @@
+.idea/
+.run/
+venv/
+.venv/
+.tox/
+dist/
+reports/
+.coverage
+.vscode/
+**egg**
+**__pycache__**
+.DS_Store
+.png
+*.log*
+*.lock
