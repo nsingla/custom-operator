@@ -1,9 +1,9 @@
 from kubernetes import watch
 
 from test_controller.main.constants import Constants
-from test_controller.main.models.enums.kind import Kind
 from test_controller.main.models.event import Event
 from test_controller.main.models.enums.event_type import EventType
+from test_controller.main.utils.action_utils import ActionUtils
 from test_controller.main.utils.api_clients import ApiClientFactory
 
 api_client_factory = ApiClientFactory()
@@ -24,16 +24,15 @@ def start_operator():
         for event in stream:
             event = Event(**event)
             event_type = event.type
-            custom_resource = event.object
+            custom_resource = event.resource
 
-            action_class = Kind.get_kind_from_value(custom_resource.kind).action_class
-            actions_object = action_class(custom_resource)
+            actions_object = ActionUtils.get_action_class(custom_resource.kind)(custom_resource)
 
             match event_type:
                 case EventType.ADDED:
                     logger.info(f"Received an event to create a resource of type={custom_resource.kind}")
                     actions_object.create()
-                case EventType.UPDATED:
+                case EventType.MODIFIED:
                     logger.info(f"Received an event to update a resource of type={custom_resource.kind}")
                     actions_object.update()
                     logger.info(f"Updated a resource of type={custom_resource.kind.name}")

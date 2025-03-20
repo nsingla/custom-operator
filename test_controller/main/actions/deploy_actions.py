@@ -1,7 +1,7 @@
 from kubernetes import client
 
-from test_controller.main.actions.BaseActions import BaseActions
-from test_controller.main.models.custom_resource import CustomResource
+from test_controller.main.actions.base_actions import BaseActions
+from test_controller.main.models.custom_resource import CustomResource, DeploymentResource
 from test_controller.main.utils.api_clients import ApiClientFactory
 
 api_client: client.AppsV1Api = ApiClientFactory().app_client
@@ -10,12 +10,12 @@ api_client: client.AppsV1Api = ApiClientFactory().app_client
 class DeployActions(BaseActions):
     kind = "Deployment"
 
-    def __init__(self, custom_resource: CustomResource):
+    def __init__(self, custom_resource: DeploymentResource):
         super().__init__(custom_resource)
 
     def check_existing_deployments(self, name: str):
-        pods: client.V1DeploymentList = api_client.list_namespaced_deployment(namespace=self.namespace)
-        if len(list(filter(lambda pod: pod.metadata.name == name, pods.items))) > 0:
+        deployments: client.V1DeploymentList = api_client.list_namespaced_deployment(namespace=self.namespace)
+        if len(list(filter(lambda deployment: deployment.metadata.name == name, deployments.items))) > 0:
             return True
         return False
 
@@ -24,7 +24,7 @@ class DeployActions(BaseActions):
         secrets: list[client.V1LocalObjectReference] = self.get_secrets_object()
         metadata = self.get_metadata_object()
         spec = client.V1DeploymentSpec(containers=containers,
-                                       restart_policy=self.custom_resource.restartPolicy.value,
+                                       restart_policy=self.custom_resource.specs.restart_policy.value,
                                        image_pull_secrets=secrets)
         return client.V1Deployment(api_version=self.api_version, kind=self.kind, metadata=metadata, spec=spec)
 

@@ -3,13 +3,13 @@ from abc import abstractmethod
 from kubernetes import client
 
 from test_controller.main.constants import Constants
-from test_controller.main.models.custom_resource import CustomResource
+from test_controller.main.models.custom_resource import CustomResource, COMBINED_RESOURCE
 from test_controller.main.utils.api_clients import ApiClientFactory
 
 class BaseActions(object):
     api_version = "v1"
 
-    def __init__(self, custom_resource: CustomResource):
+    def __init__(self, custom_resource: COMBINED_RESOURCE):
         """
         Constructor for Base Actions class which is the parent call for all the actions.
         """
@@ -52,21 +52,21 @@ class BaseActions(object):
 
     def get_containers_object(self) -> list[client.V1Container]:
         containers: list[client.V1Container] = list()
-        if Constants.image_registry_url or self.custom_resource.image_url:
-            image_url = self.custom_resource.image_url if self.custom_resource.image_url else Constants.image_registry_url
-            image = "/".join([image_url, self.custom_resource.image_name])
+        if Constants.image_registry_url or self.custom_resource.specs.image_url:
+            image_url = self.custom_resource.specs.image_url if self.custom_resource.specs.image_url else Constants.image_registry_url
+            image = "/".join([image_url, self.custom_resource.specs.image_name])
         else:
-            image = self.custom_resource.image_name
-        image = ":".join([image, self.custom_resource.image_tag])
-        containers.append(client.V1Container(name=self.custom_resource.name, image=image,
-                                                    command=self.custom_resource.command,
-                                                    args=self.custom_resource.args
+            image = self.custom_resource.specs.image_name
+        image = ":".join([image, self.custom_resource.specs.image_tag])
+        containers.append(client.V1Container(name=self.custom_resource.specs.name, image=image,
+                                                    command=self.custom_resource.specs.command,
+                                                    args=self.custom_resource.specs.args
                                                     )
                                  )
         return containers
 
     def get_secrets_object(self) -> list[client.V1LocalObjectReference]:
         secrets: list[client.V1LocalObjectReference] = list()
-        for secret in self.custom_resource.secrets:
+        for secret in self.custom_resource.specs.secrets:
             secrets.append(client.V1LocalObjectReference(name=secret.name))
         return secrets

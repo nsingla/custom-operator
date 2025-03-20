@@ -5,4 +5,4 @@ class EventType(Enum):
 
     ADDED = "ADDED"
     DELETED = "DELETED"
-    UPDATED = "UPDATED"
+    MODIFIED = "MODIFIED"

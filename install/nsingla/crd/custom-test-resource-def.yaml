@@ -44,29 +44,34 @@ spec:
                     type: string
                   value:
                     type: string
-            image_name:
-              type: string
-            image_url:
-              type: string
-            image_tag:
-              type: string
-            secrets:
-              type: array
-              items:
-                type: object
-                properties:
-                  name:
+            specs:
+              type: object
+              properties:
+                name:
+                  type: string
+                image_name:
+                  type: string
+                image_url:
+                  type: string
+                image_tag:
+                  type: string
+                secrets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                args:
+                  type: array
+                  items:
                     type: string
-            args:
-              type: array
-              items:
-                type: string
-            command:
-              type: array
-              items:
-                type: string
-            restartPolicy:
-              type: string
+                command:
+                  type: array
+                  items:
+                    type: string
+                restartPolicy:
+                  type: string
 
 
 

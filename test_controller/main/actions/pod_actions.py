@@ -1,7 +1,7 @@
 from kubernetes import client
 
-from test_controller.main.actions.BaseActions import BaseActions
-from test_controller.main.models.custom_resource import CustomResource
+from test_controller.main.actions.base_actions import BaseActions
+from test_controller.main.models.custom_resource import CustomResource, PodResource
 from test_controller.main.utils.api_clients import ApiClientFactory
 
 api_client: client.CoreV1Api = ApiClientFactory().core_v1_client
@@ -10,7 +10,7 @@ api_client: client.CoreV1Api = ApiClientFactory().core_v1_client
 class PodActions(BaseActions):
     kind = "Pod"
 
-    def __init__(self, custom_resource: CustomResource):
+    def __init__(self, custom_resource: PodResource):
         super().__init__(custom_resource)
 
     def check_existing_pods(self, namespace: str, name: str):
@@ -24,7 +24,7 @@ class PodActions(BaseActions):
         secrets = self.get_secrets_object()
         metadata = self.get_metadata_object()
         spec = client.V1PodSpec(containers=containers,
-                                restart_policy=self.custom_resource.restartPolicy.value,
+                                restart_policy=self.custom_resource.specs.restart_policy.value,
                                 image_pull_secrets=secrets)
         return client.V1Pod(api_version=self.api_version,
                             kind=self.kind,
