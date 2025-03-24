@@ -1,7 +1,7 @@
 from kubernetes import client
 
 from test_controller.main.actions.base_actions import BaseActions
-from test_controller.main.models.custom_resource import CustomResource, DeploymentResource
+from test_controller.main.models.custom_resource import DeploymentResource
 from test_controller.main.utils.api_clients import ApiClientFactory
 
 api_client: client.AppsV1Api = ApiClientFactory().app_client

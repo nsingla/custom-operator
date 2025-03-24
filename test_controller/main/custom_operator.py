@@ -1,9 +1,9 @@
 from kubernetes import watch
+from kubernetes.client import ApiException
 
 from test_controller.main.constants import Constants
 from test_controller.main.models.event import Event
 from test_controller.main.models.enums.event_type import EventType
-from test_controller.main.utils.action_utils import ActionUtils
 from test_controller.main.utils.api_clients import ApiClientFactory
 
 api_client_factory = ApiClientFactory()
@@ -22,28 +22,31 @@ def start_operator():
             resource_version=resource_version
         )
         for event in stream:
-            event = Event(**event)
-            event_type = event.type
-            custom_resource = event.resource
+            try:
+                event = Event(**event)
+                event_type = event.type
+                custom_resource = event.resource
 
-            actions_object = ActionUtils.get_action_class(custom_resource.kind)(custom_resource)
+                actions_object = custom_resource.kind.action_class(custom_resource)
 
-            match event_type:
-                case EventType.ADDED:
-                    logger.info(f"Received an event to create a resource of type={custom_resource.kind}")
-                    actions_object.create()
-                case EventType.MODIFIED:
-                    logger.info(f"Received an event to update a resource of type={custom_resource.kind}")
-                    actions_object.update()
-                    logger.info(f"Updated a resource of type={custom_resource.kind.name}")
-                case EventType.DELETED:
-                    logger.info(f"Deleted a resource of type={custom_resource.kind} and name={custom_resource.metadata.name}")
-                    actions_object.delete()
-                case _:
-                    logger.info("Nothing to do here")
+                match event_type:
+                    case EventType.ADDED:
+                        logger.info(f"Received an event to create a resource of type={custom_resource.kind}")
+                        actions_object.create()
+                    case EventType.MODIFIED:
+                        logger.info(f"Received an event to update a resource of type={custom_resource.kind}")
+                        actions_object.update()
+                        logger.info(f"Updated a resource of type={custom_resource.kind.name}")
+                    case EventType.DELETED:
+                        logger.info(f"Deleted a resource of type={custom_resource.kind} and name={custom_resource.metadata.name}")
+                        actions_object.delete()
+                    case _:
+                        logger.info("Nothing to do here")
 
-            # Update resource_version to resume watching from the last event
-            resource_version = custom_resource.metadata.resourceVersion
+                # Update resource_version to resume watching from the last event
+                resource_version = custom_resource.metadata.resourceVersion
+            except ApiException as ex:
+                logger.error(f"Error trying to process event: {event} due to: {ex} ")
 
 
 if __name__ == "__main__":

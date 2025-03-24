@@ -16,11 +16,11 @@ class CustomResource(BaseModelConfig):
     specs: Optional[Specification] = Field(default=None)
 
 class PodResource(CustomResource):
-    kind: Literal[ResourceType.POD.value]
+    kind: Literal[ResourceType.POD]
 
 
 class DeploymentResource(CustomResource):
-    kind: Literal[ResourceType.DEPLOY.value]
+    kind: Literal[ResourceType.DEPLOY]
 
 
 def get_discriminator_value(v: str) -> str:
